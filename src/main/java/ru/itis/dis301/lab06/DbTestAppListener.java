@@ -11,6 +11,6 @@ public class DbTestAppListener implements ServletContextListener {
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
-        DBConnection.releaseAllConnections();
+        DBConnection.closeAllConnections();
     }
 }
