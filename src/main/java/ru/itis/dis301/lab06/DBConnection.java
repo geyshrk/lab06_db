@@ -53,7 +53,7 @@ public class DBConnection {
 
     public static synchronized Connection getConnection() {
         try {
-            while (activeConnections.size() >= MAX_SIZE)
+            while (connectionQueue.isEmpty())
                 Thread.currentThread().wait();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -68,9 +68,17 @@ public class DBConnection {
         connectionQueue.add(connection);
         Thread.currentThread().notifyAll();
     }
-    public static void releaseAllConnections(){
-        for(Connection connection : activeConnections) {
-            releaseConnection(connection);
+    public static void closeAllConnections(){
+
+            try {
+                for(Connection connection : activeConnections) {
+                    connection.close();
+                }
+                for(Connection connection : connectionQueue) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
-    }
 }
